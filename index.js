@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
 app.listen(8090, function(){
@@ -14,4 +16,5 @@ app.get('/', (req, res) => {
 
 app.post('/show', (req, res) => {
     console.log('Test');
+    console.log(req.body);
 });
