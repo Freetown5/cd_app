@@ -9,6 +9,11 @@ const uri = `mongodb+srv://${process.env.API_USERNAME}:${process.env.API_KEY}@cl
 const client = new MongoClient(uri, {  useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res) => {
+    res.render('template.ejs');
+});
 
 client.connect(err => {
     const collection = client.db("cd_app").collection("cds");
@@ -16,10 +21,6 @@ client.connect(err => {
     app.listen(8090, function(){
         console.log("app working on port 8090");
     });
-
-    app.get('/', (req, res) => {
-        const cursor = collection.find();
-    })
 
     app.post('/show', (req, res) => {
         collection.insertOne(req.body, (err, result) => {
@@ -65,21 +66,14 @@ client.connect(err => {
             console.log("Successfully Updated!");
         });
     });
-    // client.close();
+
+    app.route('/delete/:id')
+    .get((req, res) => {
+        const id = req.params.id;
+        collection.deleteOne({_id: ObjectId(id)}, (err, result) => {
+            if (err) return res.send(500, err);
+            console.log("Registration deleted successfully!");
+            res.redirect('/show');
+        });
+    });
 });
-
-app.set('view engine', 'ejs');
-
-app.get('/', (req, res) => {
-    // res.send('App cd\'s');
-    res.render('template.ejs');
-});
-
-// app.post('/show', (req, res) => {
-//     collection.insertOne(req.body, (err, result) => {
-//         if(err) return console.log("Error:" + err);
-
-//         console.log("Recorded successfully, saved to BD!");
-//         res.redirect('/');
-//     });
-// });
